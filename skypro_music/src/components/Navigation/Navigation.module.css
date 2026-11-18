@@ -61,3 +61,36 @@
   font-size: 16px;
   line-height: 24px;
 }
+
+.nav__burger {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav__burger:focus-visible,
+.menu__link:focus-visible {
+  outline: 2px solid #b672ff;
+  outline-offset: 4px;
+}
+
+.nav__menu {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition: grid-template-rows 220ms ease, opacity 220ms ease, visibility 220ms ease;
+}
+
+.nav__menu_open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav__menu > .menu__list { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__menu { transition: none; }
+}
+.nav__menu > .menu__list { min-height: 0; }
