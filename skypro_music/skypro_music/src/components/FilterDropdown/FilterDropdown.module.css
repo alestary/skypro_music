@@ -1,0 +1,44 @@
+.popup {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 10px);
+  left: 0;
+  min-width: 180px;
+  max-width: 248px;
+  padding: 24px;
+  background: #313131;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: max-content;
+  max-width: 200px;
+  max-height: 237px;
+  padding-right: 8px;
+  overflow-y: auto;
+  color: #fff;
+  list-style: none;
+}
+
+.list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.list::-webkit-scrollbar-track {
+  background-color: #4b4949;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.option {
+  font-size: 16px;
+  line-height: 24px;
+  white-space: nowrap;
+}
