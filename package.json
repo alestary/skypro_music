@@ -1,4 +1,13 @@
 {
+  "name": "skypro_music",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix skypro_music run dev",
+    "build": "npm --prefix skypro_music run build",
+    "start": "npm --prefix skypro_music run start",
+    "lint": "npm --prefix skypro_music run lint",
+    "typecheck": "npm --prefix skypro_music run typecheck"
+  },
   "dependencies": {
     "classnames": "^2.5.1"
   }

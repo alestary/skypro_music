@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { data } from '@/data';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectTrack, setPlaying } from '@/store/playerSlice';
 import styles from './Player.module.css';
@@ -16,7 +15,7 @@ function formatTime(seconds: number): string {
 export default function Player() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const dispatch = useAppDispatch();
-  const { currentTrack, isPlaying } = useAppSelector((state) => state.player);
+  const { currentTrack, isPlaying, tracks } = useAppSelector((state) => state.player);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.65);
@@ -54,22 +53,22 @@ export default function Player() {
 
   const changeTrack = (direction: -1 | 1) => {
     if (!currentTrack) return;
-    const currentIndex = data.findIndex((track) => track._id === currentTrack._id);
-    if (currentIndex < 0) return;
-    const nextIndex = (currentIndex + direction + data.length) % data.length;
-    dispatch(selectTrack(data[nextIndex]));
+    const currentIndex = tracks.findIndex((track) => track._id === currentTrack._id);
+    if (currentIndex < 0 || tracks.length === 0) return;
+    const nextIndex = (currentIndex + direction + tracks.length) % tracks.length;
+    dispatch(selectTrack(tracks[nextIndex]));
   };
 
   const playRandomTrack = () => {
-    if (data.length === 0) return;
-    const availableTracks = data.filter((track) => track._id !== currentTrack?._id);
+    if (tracks.length === 0) return;
+    const availableTracks = tracks.filter((track) => track._id !== currentTrack?._id);
     const randomTrack = availableTracks[Math.floor(Math.random() * availableTracks.length)];
     if (randomTrack) dispatch(selectTrack(randomTrack));
   };
 
   const togglePlayback = () => {
     if (!currentTrack) {
-      dispatch(selectTrack(data[0]));
+      if (tracks[0]) dispatch(selectTrack(tracks[0]));
       return;
     }
     dispatch(setPlaying(!isPlaying));
@@ -126,7 +125,7 @@ export default function Player() {
               <button type="button" className={styles.player__btnPrev} onClick={() => changeTrack(-1)} disabled={!currentTrack} aria-label="Предыдущий трек">
                 <svg className={styles.player__btnPrevSvg}><use href="/icon/sprite.svg#icon-prev" /></svg>
               </button>
-              <button type="button" className={`${styles.player__btnPlay} ${styles.btn}`} onClick={togglePlayback} aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'} disabled={data.length === 0}>
+              <button type="button" className={`${styles.player__btnPlay} ${styles.btn}`} onClick={togglePlayback} aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'} disabled={tracks.length === 0}>
                 <svg className={styles.player__btnPlaySvg}>
                   <use href={`/icon/sprite.svg#icon-${isPlaying ? 'pause' : 'play'}`} />
                 </svg>
