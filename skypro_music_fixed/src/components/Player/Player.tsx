@@ -13,19 +13,6 @@ function formatTime(seconds: number): string {
   return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
-function createShuffledTrackIds(excludedTrackId?: number): number[] {
-  const trackIds = data
-    .filter((track) => track._id !== excludedTrackId)
-    .map((track) => track._id);
-
-  for (let index = trackIds.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1));
-    [trackIds[index], trackIds[randomIndex]] = [trackIds[randomIndex], trackIds[index]];
-  }
-
-  return trackIds;
-}
-
 export default function Player() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const dispatch = useAppDispatch();
@@ -35,7 +22,6 @@ export default function Player() {
   const [volume, setVolume] = useState(0.65);
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
-  const [shuffleQueue, setShuffleQueue] = useState<number[]>([]);
 
 
   useEffect(() => {
@@ -66,40 +52,19 @@ export default function Player() {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
 
-  const currentIndex = currentTrack
-    ? data.findIndex((track) => track._id === currentTrack._id)
-    : -1;
-
   const changeTrack = (direction: -1 | 1) => {
+    if (!currentTrack) return;
+    const currentIndex = data.findIndex((track) => track._id === currentTrack._id);
     if (currentIndex < 0) return;
-
-    const nextIndex = currentIndex + direction;
-    if (nextIndex < 0 || nextIndex >= data.length) return;
-
+    const nextIndex = (currentIndex + direction + data.length) % data.length;
     dispatch(selectTrack(data[nextIndex]));
   };
 
   const playRandomTrack = () => {
-    const remainingQueue = shuffleQueue.filter((trackId) => trackId !== currentTrack?._id);
-    const nextQueue = remainingQueue.length > 0
-      ? remainingQueue
-      : createShuffledTrackIds(currentTrack?._id);
-    const [nextTrackId, ...updatedQueue] = nextQueue;
-    const nextTrack = data.find((track) => track._id === nextTrackId);
-
-    if (!nextTrack) {
-      dispatch(setPlaying(false));
-      return;
-    }
-
-    setShuffleQueue(updatedQueue);
-    dispatch(selectTrack(nextTrack));
-  };
-
-  const toggleShuffle = () => {
-    const nextShuffleState = !isShuffle;
-    setIsShuffle(nextShuffleState);
-    setShuffleQueue(nextShuffleState ? createShuffledTrackIds(currentTrack?._id) : []);
+    if (data.length === 0) return;
+    const availableTracks = data.filter((track) => track._id !== currentTrack?._id);
+    const randomTrack = availableTracks[Math.floor(Math.random() * availableTracks.length)];
+    if (randomTrack) dispatch(selectTrack(randomTrack));
   };
 
   const togglePlayback = () => {
@@ -118,25 +83,7 @@ export default function Player() {
     }
   };
 
-  const handleTrackEnded = () => {
-    if (isRepeat && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      void audioRef.current.play().catch(() => dispatch(setPlaying(false)));
-      return;
-    }
-
-    if (isShuffle) {
-      playRandomTrack();
-      return;
-    }
-
-    if (currentIndex >= 0 && currentIndex < data.length - 1) {
-      dispatch(selectTrack(data[currentIndex + 1]));
-      return;
-    }
-
-    dispatch(setPlaying(false));
-  };
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div className={styles.bar}>
@@ -145,30 +92,21 @@ export default function Player() {
         className={styles.audio}
         preload="none"
         onPlay={() => dispatch(setPlaying(true))}
-        onLoadStart={() => {
-          setCurrentTime(0);
-          setDuration(0);
-        }}
         onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
-        onLoadedMetadata={(event) => {
-          const nextDuration = event.currentTarget.duration;
-          setDuration(Number.isFinite(nextDuration) ? nextDuration : 0);
+        onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)}
+        onDurationChange={(event) => setDuration(event.currentTarget.duration)}
+        onEnded={() => {
+          if (isRepeat && audioRef.current) {
+            audioRef.current.currentTime = 0;
+            void audioRef.current.play().catch(() => dispatch(setPlaying(false)));
+          } else {
+            dispatch(setPlaying(false));
+          }
         }}
-        onDurationChange={(event) => {
-          const nextDuration = event.currentTarget.duration;
-          setDuration(Number.isFinite(nextDuration) ? nextDuration : 0);
-        }}
-        onEnded={handleTrackEnded}
         onError={() => dispatch(setPlaying(false))}
       />
       <div className={styles.bar__content}>
         <div className={styles.bar__playerProgress}>
-          <progress
-            className={styles.progress__bar}
-            max={duration || 1}
-            value={Math.min(currentTime, duration || 1)}
-            aria-hidden="true"
-          />
           <input
             className={styles.progress__input}
             type="range"
@@ -178,13 +116,14 @@ export default function Player() {
             value={Math.min(currentTime, duration || 0)}
             onChange={(event) => handleSeek(event.target.value)}
             aria-label="Позиция воспроизведения"
+            style={{ background: `linear-gradient(to right, #b672ff ${progress}%, #4b4949 ${progress}%)` }}
             disabled={!currentTrack || !duration}
           />
         </div>
         <div className={styles.bar__playerBlock}>
           <div className={styles.bar__player}>
             <div className={styles.player__controls}>
-              <button type="button" className={styles.player__btnPrev} onClick={() => changeTrack(-1)} disabled={!currentTrack || currentIndex <= 0} aria-label="Предыдущий трек">
+              <button type="button" className={styles.player__btnPrev} onClick={() => changeTrack(-1)} disabled={!currentTrack} aria-label="Предыдущий трек">
                 <svg className={styles.player__btnPrevSvg}><use href="/icon/sprite.svg#icon-prev" /></svg>
               </button>
               <button type="button" className={`${styles.player__btnPlay} ${styles.btn}`} onClick={togglePlayback} aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'} disabled={data.length === 0}>
@@ -192,13 +131,13 @@ export default function Player() {
                   <use href={`/icon/sprite.svg#icon-${isPlaying ? 'pause' : 'play'}`} />
                 </svg>
               </button>
-              <button type="button" className={styles.player__btnNext} onClick={() => (isShuffle ? playRandomTrack() : changeTrack(1))} disabled={!currentTrack || (!isShuffle && currentIndex >= data.length - 1)} aria-label="Следующий трек">
+              <button type="button" className={styles.player__btnNext} onClick={() => (isShuffle ? playRandomTrack() : changeTrack(1))} disabled={!currentTrack} aria-label="Следующий трек">
                 <svg className={styles.player__btnNextSvg}><use href="/icon/sprite.svg#icon-next" /></svg>
               </button>
               <button type="button" className={`${styles.player__btnRepeat} ${styles.btnIcon} ${isRepeat ? styles.controlActive : ''}`} onClick={() => setIsRepeat((value) => !value)} aria-label="Повтор трека" aria-pressed={isRepeat}>
                 <svg className={styles.player__btnRepeatSvg}><use href="/icon/sprite.svg#icon-repeat" /></svg>
               </button>
-              <button type="button" className={`${styles.player__btnShuffle} ${styles.btnIcon} ${isShuffle ? styles.controlActive : ''}`} onClick={toggleShuffle} aria-label="Случайный порядок" aria-pressed={isShuffle}>
+              <button type="button" className={`${styles.player__btnShuffle} ${styles.btnIcon} ${isShuffle ? styles.controlActive : ''}`} onClick={() => setIsShuffle((value) => !value)} aria-label="Случайный порядок" aria-pressed={isShuffle}>
                 <svg className={styles.player__btnShuffleSvg}><use href="/icon/sprite.svg#icon-shuffle" /></svg>
               </button>
             </div>
