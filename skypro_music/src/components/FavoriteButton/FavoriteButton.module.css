@@ -1,0 +1,13 @@
+.button { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 30px; height: 30px; border: 0; border-radius: 50%; color: #777; background: transparent; transition: color .18s ease, transform .18s ease; cursor: pointer; }
+.button svg { width: 16px; height: 16px; fill: transparent; stroke: currentColor; stroke-width: 1.7; }
+.button:hover, .button:focus-visible { color: #fff; }
+.button:focus-visible { outline: 2px solid #b672ff; outline-offset: 2px; }
+.button:active { transform: scale(.88); }
+.active { color: #b672ff; }
+.active svg { fill: currentColor; }
+.compact { width: 26px; height: 26px; }
+@media (prefers-reduced-motion: reduce) { .button { transition: none; } }
+
+.wrapper { display: inline-flex; align-items: center; gap: 5px; }
+.error { color: #ff8585; font-size: 11px; max-width: 210px; }
+.count { min-width: 12px; color: #777; font-size: 11px; line-height: 1; font-variant-numeric: tabular-nums; }

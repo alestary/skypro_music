@@ -1,9 +1,0 @@
-.page { width: 100%; padding: 40px 40px 30px 70px; color: #fff; }
-.title { margin: 0 0 12px; font-size: 48px; line-height: 1.2; font-weight: 500; }
-.subtitle { margin-bottom: 38px; color: #b672ff; font-size: 18px; }
-.heading { display: grid; grid-template-columns: minmax(180px, 1.6fr) minmax(130px, 1fr) minmax(110px, .9fr) 55px; gap: 14px; margin-bottom: 20px; color: #696969; font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; }
-.message { margin: 24px 0; color: #aaa; font-size: 14px; line-height: 1.7; }
-.error { color: #ff9b9b; font-size: 14px; }
-.error button { margin-top: 12px; padding: 8px 14px; border: 1px solid #b672ff; border-radius: 20px; background: transparent; color: #fff; }
-@media (max-width: 1100px) { .page { padding: 28px 24px; } }
-@media (max-width: 760px) { .title { font-size: 34px; } .heading { grid-template-columns: 1fr 1fr 48px; } .heading span:nth-child(3) { display: none; } .heading span:nth-child(4) { display: none; } }

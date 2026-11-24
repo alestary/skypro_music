@@ -29,6 +29,7 @@ export default function Signin() {
       if (user && typeof user === 'object' && 'username' in user && typeof user.username === 'string') {
         window.localStorage.setItem('username', user.username);
       }
+      window.dispatchEvent(new Event('auth-changed'));
       router.replace('/');
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Не удалось войти. Попробуйте ещё раз.');

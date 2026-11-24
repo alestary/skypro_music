@@ -108,3 +108,6 @@
 @media (prefers-reduced-motion: reduce) {
   .track__playingDot_active { animation: none; }
 }
+
+.trackRow { display: flex; align-items: center; gap: 8px; width: 100%; }
+.trackRow .playlist__track { flex: 1 1 auto; min-width: 0; }
