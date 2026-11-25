@@ -28,7 +28,7 @@ export default function Navigation() {
       <div id="main-navigation-menu" className={`${styles.nav__menu} ${isMenuOpen ? styles.nav__menu_open : ''}`} aria-hidden={!isMenuOpen}>
         <ul className={styles.menu__list}>
           <li className={styles.menu__item}><Link href="/" className={styles.menu__link} tabIndex={isMenuOpen ? 0 : -1}>Главное</Link></li>
-          <li className={styles.menu__item}><Link href="/" className={styles.menu__link} tabIndex={isMenuOpen ? 0 : -1}>Мой плейлист</Link></li>
+          <li className={styles.menu__item}><Link href="/favorites" className={styles.menu__link} tabIndex={isMenuOpen ? 0 : -1}>Избранное</Link></li>
           <li className={styles.menu__item}><Link href="/signin" className={styles.menu__link} tabIndex={isMenuOpen ? 0 : -1}>Войти</Link></li>
         </ul>
       </div>

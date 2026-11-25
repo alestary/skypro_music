@@ -20,7 +20,8 @@ export default function Sidebar({ selections, error }: SidebarProps) {
     window.localStorage.removeItem('access');
     window.localStorage.removeItem('refresh');
     window.localStorage.removeItem('username');
-    router.push('/signin');
+    window.dispatchEvent(new Event('auth-changed'));
+    router.push('/');
   };
   return (
     <aside className={styles.main__sidebar} aria-label="Профиль и подборки">
