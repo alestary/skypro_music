@@ -37,7 +37,6 @@ export default function CenterBlock() {
     return () => { active = false; };
   }, [dispatch]);
 
-  // Варианты фильтров всегда рассчитываются по полному каталогу, а не по текущей выборке.
   const filterOptions = useMemo(() => getFilterOptions(tracks), [tracks]);
 
   const visibleTracks = useMemo(() => {
