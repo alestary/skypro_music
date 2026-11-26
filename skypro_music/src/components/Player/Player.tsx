@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectTrack, setPlaying } from '@/store/playerSlice';
 import styles from './Player.module.css';
-import FavoriteButton from '@/components/FavoriteButton/FavoriteButton';
 
 function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
@@ -154,7 +153,14 @@ export default function Player() {
                   <span className={styles.trackPlay__albumLink} title={currentTrack?.album ?? ''}>{currentTrack?.author ?? 'Skypro.Music'}</span>
                 </div>
               </div>
-              {currentTrack && <div className={styles.trackPlay__dislike}><FavoriteButton track={currentTrack} /></div>}
+              <div className={styles.trackPlay__dislike}>
+                <button type="button" className={`${styles.player__btnShuffle} ${styles.btnIcon}`} aria-label="Добавить в избранное">
+                  <svg className={styles.trackPlay__likeSvg}><use href="/icon/sprite.svg#icon-like" /></svg>
+                </button>
+                <button type="button" className={`${styles.trackPlay__dislike} ${styles.btnIcon}`} aria-label="Не нравится">
+                  <svg className={styles.trackPlay__dislikeSvg}><use href="/icon/sprite.svg#icon-dislike" /></svg>
+                </button>
+              </div>
             </div>
           </div>
           <div className={styles.bar__volumeBlock}>
